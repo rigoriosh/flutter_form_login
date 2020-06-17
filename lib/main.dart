@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
       initialRoute: 'login',
       routes: {
         'login': (BuildContext context) => LoginPage(),
-        'home' : (BuildContext context) => HomePage(),
+        HomePage.routeName : (BuildContext context) => HomePage(),
       },
       theme: ThemeData(
         primaryColor: Colors.deepPurple
