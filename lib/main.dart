@@ -34,6 +34,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_login/src/bloc/provider.dart';
 import 'package:flutter_form_login/src/pages/page_home.dart';
 import 'package:flutter_form_login/src/pages/page_login.dart';
+import 'package:flutter_form_login/src/pages/produc_page.dart';
  
 void main() => runApp(MyApp());
  
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
       routes: {
         'login': (BuildContext context) => LoginPage(),
         HomePage.routeName : (BuildContext context) => HomePage(),
+        ProductoPage.routname : (BuildContext context) => ProductoPage(),
       },
       theme: ThemeData(
         primaryColor: Colors.deepPurple
