@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_login/src/modelos/producto_model.dart';
+import 'package:flutter_form_login/src/providers/productos_provider.dart';
 import 'package:flutter_form_login/src/utils.dart' as utils;
 
 class ProductoPage extends StatefulWidget {
@@ -47,14 +48,14 @@ class _ProductoPageState extends State<ProductoPage> {
   Widget _crearDisponible() {
     return SwitchListTile(
       title: Text('Disponibe'),
-      value: modeloProducto.disponible,      
-      onChanged: (value){
+      value: modeloProducto.disponible,
+      onChanged: (value) {
         setState(() {
           modeloProducto.disponible = value;
         });
       },
       activeColor: Colors.purple,
-      );
+    );
   }
 
   Widget _btnSubmit() {
@@ -77,14 +78,17 @@ class _ProductoPageState extends State<ProductoPage> {
   }
 
   void _submint() {
-    if (!myFormKey.currentState.validate())
-      return; // if the form is not valid return false, else continue whit code below
+    if (!myFormKey.currentState.validate()) return; // if the form is not valid return false, else continue whit code below
     //Action to developem whuend the form is ok
     print('all ok');
     myFormKey.currentState.save(); //ejecute all saves of fields.
     print(modeloProducto.titulo);
     print(modeloProducto.valor);
     print(modeloProducto.disponible);
+
+    final productosProvider = new ProductosProvider();
+    productosProvider.crearProducto(modeloProducto);
+
   }
 
   Widget _crearNombre() {
