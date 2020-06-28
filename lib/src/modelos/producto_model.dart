@@ -18,8 +18,8 @@ class ProductoModel {
 
   ProductoModel({
     this.id,
-    this.titulo = 'datoInitial',
-    this.valor = 0.5,
+    this.titulo,
+    this.valor = 0.0,
     this.disponible = true,
     this.fotoUrl,
   });
@@ -33,7 +33,7 @@ class ProductoModel {
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
+        //"id": id,
         "titulo": titulo,
         "valor": valor,
         "disponible": disponible,

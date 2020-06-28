@@ -22,9 +22,7 @@ class HomePage extends StatelessWidget {
       future: ProductosProvider().traerProductoDB(),
       builder:
           (BuildContext context, AsyncSnapshot<List<ProductoModel>> snapshot) {
-        if (snapshot.hasData) {
-          print("///////page_home");
-          print(snapshot.data);
+        if (snapshot.hasData) {         
           final data = snapshot.data;
           return ListView.builder(
             itemCount: data.length,
@@ -55,8 +53,8 @@ class HomePage extends StatelessWidget {
       background: Container(
         color: Colors.red,
       ),
-      onDismissed: (direccion){
-        //TODO: Borrar producto
+      onDismissed: (direccion){        
+        ProductosProvider().deleteProducto(data.id);
       },
     );
   }

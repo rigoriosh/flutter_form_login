@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:flutter_form_login/src/modelos/producto_model.dart';
 import 'package:flutter_form_login/src/providers/productos_provider.dart';
 import 'package:flutter_form_login/src/utils.dart' as utils;
+import 'package:image_picker/image_picker.dart';
 
 class ProductoPage extends StatefulWidget {
   //const ProductoPage({Key key}) : super(key: key);
@@ -13,17 +15,32 @@ class ProductoPage extends StatefulWidget {
 
 class _ProductoPageState extends State<ProductoPage> {
   final myFormKey = GlobalKey<FormState>();
+  final myScaffoldKey = GlobalKey<ScaffoldState>();
   ProductoModel modeloProducto = new ProductoModel();
+  bool _guardando = false;
+  File foto;
 
   @override
   Widget build(BuildContext context) {
+    final ProductoModel prodData = ModalRoute.of(context)
+        .settings
+        .arguments; //carga la data enviada como argumentos
+    if (prodData != null) {
+      modeloProducto = prodData;
+    }
     return Scaffold(
+      key: myScaffoldKey,
       appBar: AppBar(
         title: Text('Producto'),
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.photo_size_select_actual), onPressed: () {}),
-          IconButton(icon: Icon(Icons.camera_alt), onPressed: () {}),
+            icon: Icon(Icons.photo_size_select_actual),
+            onPressed: _seleccionarFoto,
+          ),
+          IconButton(
+            icon: Icon(Icons.camera_alt),
+            onPressed: _tomarFoto,
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -34,6 +51,7 @@ class _ProductoPageState extends State<ProductoPage> {
               key: myFormKey,
               child: Column(
                 children: <Widget>[
+                  _mostrarFoto(),
                   _crearNombre(),
                   _crearPrecio(),
                   _crearDisponible(),
@@ -45,10 +63,46 @@ class _ProductoPageState extends State<ProductoPage> {
     );
   }
 
+  _seleccionarFoto() async {
+    // ignore: deprecated_member_use
+    foto = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    if (foto != null) {
+      //TODO:limpieza
+    }
+    setState(() {});
+  }
+
+  Widget _mostrarFoto() {
+    if (modeloProducto.fotoUrl != null) {
+      //TODO: tengo que ajustar esto
+      return Container();
+    } else {
+      return Image(
+        image: AssetImage(foto?.path??'images/noImage.png'),//si foto no es null toma el path, si no toma la imagen por defecto
+        height: 300.0,
+        fit: BoxFit.cover,
+      );
+    }
+  }
+
+  _tomarFoto() {}
+
+  void mostrarSnackBar(String msm) {
+    final snackbar = SnackBar(
+      content: Text(msm),
+      duration: Duration(milliseconds: 1500),
+    );
+
+    myScaffoldKey.currentState.showSnackBar(snackbar);
+  }
+
   Widget _crearDisponible() {
     return SwitchListTile(
       title: Text('Disponibe'),
-      value: modeloProducto.disponible,
+      value: (modeloProducto.disponible == null)
+          ? false
+          : modeloProducto.disponible,
       onChanged: (value) {
         setState(() {
           modeloProducto.disponible = value;
@@ -64,31 +118,32 @@ class _ProductoPageState extends State<ProductoPage> {
       child: RaisedButton.icon(
           label: Text('Guardar'),
           icon: Icon(Icons.save),
-          /* child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 15.0),
-            child: Text('Ingresar'),
-          ), */
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
           elevation: 5.0,
           color: Colors.deepPurple,
           textColor: Colors.white,
-          onPressed: _submint),
+          onPressed: (_guardando) ? null : _submint),
     );
   }
 
   void _submint() {
-    if (!myFormKey.currentState.validate()) return; // if the form is not valid return false, else continue whit code below
+    if (!myFormKey.currentState.validate())
+      return; // if the form is not valid return false, else continue whit code below
     //Action to developem whuend the form is ok
-    print('all ok');
-    myFormKey.currentState.save(); //ejecute all saves of fields.
-    print(modeloProducto.titulo);
-    print(modeloProducto.valor);
-    print(modeloProducto.disponible);
-
+    myFormKey.currentState.save(); //ejecute all saves of the fields.
     final productosProvider = new ProductosProvider();
-    productosProvider.crearProducto(modeloProducto);
+    _guardando = true;
 
+    if (modeloProducto.id == null) {
+      productosProvider.crearProducto(modeloProducto);
+      mostrarSnackBar("Succesful saved product");
+    } else {
+      productosProvider.editProducto(modeloProducto);
+      mostrarSnackBar("Succesful edited product");
+    }
+    setState(() {});
+    Navigator.pop(context);
   }
 
   Widget _crearNombre() {
