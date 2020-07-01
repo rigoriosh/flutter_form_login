@@ -16,6 +16,7 @@ class ProductoPage extends StatefulWidget {
 class _ProductoPageState extends State<ProductoPage> {
   final myFormKey = GlobalKey<FormState>();
   final myScaffoldKey = GlobalKey<ScaffoldState>();
+  final productosProvider = new ProductosProvider();
   ProductoModel modeloProducto = new ProductoModel();
   bool _guardando = false;
   File foto;
@@ -35,10 +36,12 @@ class _ProductoPageState extends State<ProductoPage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.photo_size_select_actual),
+            tooltip: "Galery",
             onPressed: _seleccionarFoto,
           ),
           IconButton(
             icon: Icon(Icons.camera_alt),
+            tooltip: 'Camare',
             onPressed: _tomarFoto,
           ),
         ],
@@ -64,29 +67,40 @@ class _ProductoPageState extends State<ProductoPage> {
   }
 
   _seleccionarFoto() async {
-    // ignore: deprecated_member_use
-    foto = await ImagePicker.pickImage(source: ImageSource.gallery);
-
-    if (foto != null) {
-      //TODO:limpieza
-    }
-    setState(() {});
+    _procesarImagen(ImageSource.gallery);
   }
 
   Widget _mostrarFoto() {
     if (modeloProducto.fotoUrl != null) {
-      //TODO: tengo que ajustar esto
-      return Container();
+      return FadeInImage(
+        placeholder: AssetImage('images/loading.gif'),
+        image: NetworkImage(modeloProducto.fotoUrl),
+        height: 300,
+        fit: BoxFit.contain,
+      );
     } else {
       return Image(
-        image: AssetImage(foto?.path??'images/noImage.png'),//si foto no es null toma el path, si no toma la imagen por defecto
+        image: AssetImage(foto?.path ??
+            'images/noImage.png'), //si foto no es null toma el path, si no toma la imagen por defecto
         height: 300.0,
         fit: BoxFit.cover,
       );
     }
   }
 
-  _tomarFoto() {}
+  _tomarFoto() async {
+    _procesarImagen(ImageSource.camera);
+  }
+
+  _procesarImagen(ImageSource origen) async {
+    // ignore: deprecated_member_use
+    foto = await ImagePicker.pickImage(source: origen);
+    setState(() {
+      if (foto != null) {
+        modeloProducto.fotoUrl = null;
+      }
+    });
+  }
 
   void mostrarSnackBar(String msm) {
     final snackbar = SnackBar(
@@ -127,13 +141,19 @@ class _ProductoPageState extends State<ProductoPage> {
     );
   }
 
-  void _submint() {
+  Future<void> _submint() async {
     if (!myFormKey.currentState.validate())
       return; // if the form is not valid return false, else continue whit code below
-    //Action to developem whuend the form is ok
+    //Action to developem when the form is ok
     myFormKey.currentState.save(); //ejecute all saves of the fields.
-    final productosProvider = new ProductosProvider();
+
     _guardando = true;
+
+    if (foto != null) {
+      print("/////////////////////////////subiendo foto");
+      modeloProducto.fotoUrl = await productosProvider.subirImagen(foto);
+      print("******************************foto cargada");
+    }
 
     if (modeloProducto.id == null) {
       productosProvider.crearProducto(modeloProducto);
@@ -142,7 +162,8 @@ class _ProductoPageState extends State<ProductoPage> {
       productosProvider.editProducto(modeloProducto);
       mostrarSnackBar("Succesful edited product");
     }
-    setState(() {});
+
+    //setState(() {});
     Navigator.pop(context);
   }
 

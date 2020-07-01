@@ -22,7 +22,7 @@ class HomePage extends StatelessWidget {
       future: ProductosProvider().traerProductoDB(),
       builder:
           (BuildContext context, AsyncSnapshot<List<ProductoModel>> snapshot) {
-        if (snapshot.hasData) {         
+        if (snapshot.hasData) {
           final data = snapshot.data;
           return ListView.builder(
             itemCount: data.length,
@@ -43,19 +43,44 @@ class HomePage extends StatelessWidget {
 
   Widget _mostrarProducto(ProductoModel data, BuildContext context) {
     return Dismissible(
-      child: ListTile(
-        title: Text('${data.titulo} - ${data.valor}'),
-        subtitle: Text('${data.id}'),
-        onTap: () => Navigator.pushNamed(context, ProductoPage.routname,
-            arguments: data),
-      ),
+      child: _listarProductos(data, context),
       key: UniqueKey(),
       background: Container(
         color: Colors.red,
       ),
-      onDismissed: (direccion){        
+      onDismissed: (direccion) {
         ProductosProvider().deleteProducto(data.id);
       },
+    );
+  }
+
+  Widget _listarProductos(ProductoModel data, BuildContext context) {
+    return Card(
+      elevation: 15.0,
+      child: Column(
+        children: <Widget>[
+          (data.fotoUrl == null)
+              ? Image(
+                  image: AssetImage('images/noImage.png'),
+                  height: 250.0,
+                  fit: BoxFit.cover,
+                  width: double.infinity)
+              : FadeInImage(
+                  placeholder: AssetImage('images/loading.gif'),
+                  image: NetworkImage(data.fotoUrl),
+                  height: 250.0,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+          ListTile(
+            title: Text('${data.titulo} - ${data.valor}'),
+            subtitle: Text('${data.id}'),
+            onTap: () => Navigator.pushNamed(context, ProductoPage.routname,
+                arguments: data),
+          ),
+          Divider()
+        ],
+      ),
     );
   }
 
