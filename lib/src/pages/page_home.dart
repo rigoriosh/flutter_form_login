@@ -12,14 +12,14 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('pagina home'),
       ),
-      body: _productodDB(),
+      body: _productodDB(context),
       floatingActionButton: _crearBoton(context),
     );
   }
 
-  Widget _productodDB() {
+  Widget _productodDB(BuildContext context) {
     return FutureBuilder(
-      future: ProductosProvider().traerProductoDB(),
+      future: ProductosProvider().traerProductoDB(context),
       builder:
           (BuildContext context, AsyncSnapshot<List<ProductoModel>> snapshot) {
         if (snapshot.hasData) {

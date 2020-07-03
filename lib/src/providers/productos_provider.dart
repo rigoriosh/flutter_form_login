@@ -1,17 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_form_login/src/preferencias_usuario/preferencias_usuario.dart';
+import 'package:flutter_form_login/src/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_form_login/src/modelos/producto_model.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:http_parser/http_parser.dart';
 
 class ProductosProvider {
+  static final _prefs = new PreferenciasUsuario();
   final String _urlBase =
       "https://flutter-varius-de545.firebaseio.com/productos";
   final String _urlJson =
-      "https://flutter-varius-de545.firebaseio.com/productos.json";
+      "https://flutter-varius-de545.firebaseio.com/productos.json?auth=${_prefs.token}";
 
+  
   Future<bool> crearProducto(ProductoModel producto) async {
     final respuesta =
         await http.post(_urlJson, body: productoModelToJson(producto));
@@ -25,15 +30,20 @@ class ProductosProvider {
   Future<bool> editProducto(ProductoModel producto) async {
     final strinfUrl = '$_urlBase/${producto.id}.json';
     print(strinfUrl);
-    final respuesta = await http.put(strinfUrl,
-        body: productoModelToJson(producto));
+    final respuesta =
+        await http.put(strinfUrl, body: productoModelToJson(producto));
     final decodificarData = json.decode(respuesta.body);
     return true;
   }
 
-  Future<List<ProductoModel>> traerProductoDB() async {
+  Future<List<ProductoModel>> traerProductoDB(BuildContext context) async {
     final respuestaDB = await http.get(_urlJson);
     final Map<String, dynamic> decodificarData = json.decode(respuestaDB.body);
+    
+    if (respuestaDB.statusCode == 401) {
+      mostrarAlerta(context, decodificarData["error"]);
+      Navigator.pop(context);      
+    }
     final List<ProductoModel> listaProductos = new List();
     if (decodificarData == null) return [];
 
@@ -46,7 +56,7 @@ class ProductosProvider {
   }
 
   Future<bool> deleteProducto(String id) async {
-    final respuestaDB = await http.delete('$_urlBase/$id.json');
+    final respuestaDB = await http.delete('$_urlBase/$id.json?auth=${_prefs.token}');
 
     print(json.decode(respuestaDB.body));
 
@@ -59,7 +69,8 @@ class ProductosProvider {
     final tipoDeImagen =
         mime(imagen.path).split('/'); //identifica el tipo de imagen
     final peticionSubirImagen = http.MultipartRequest('POST', url);
-    final archivo = await http.MultipartFile.fromPath('file', imagen.path, contentType: MediaType(tipoDeImagen[0], tipoDeImagen[1]));
+    final archivo = await http.MultipartFile.fromPath('file', imagen.path,
+        contentType: MediaType(tipoDeImagen[0], tipoDeImagen[1]));
     peticionSubirImagen.files.add(archivo);
 
     final streamResponse = await peticionSubirImagen.send();
@@ -70,7 +81,7 @@ class ProductosProvider {
       print('Algo salio mal');
       print(respuesta.body);
       return null;
-    } 
+    }
 
     final respData = json.decode(respuesta.body);
     print(respData);

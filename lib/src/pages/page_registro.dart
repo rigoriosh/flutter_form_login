@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_login/src/bloc/provider.dart';
 import 'package:flutter_form_login/src/pages/page_home.dart';
-import 'package:flutter_form_login/src/pages/page_registro.dart';
 import 'package:flutter_form_login/src/providers/usuario_provider.dart';
 import 'package:flutter_form_login/src./utils.dart';
 
-class LoginPage extends StatelessWidget {
+class Paginagistro extends StatelessWidget {
+  //const Paginagistro({Key key}) : super(key: key);
+
   final usuarioProvider = new UsuarioProvider();
+
+  static final routname = 'paginaRegistro';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //backgroundColor: Colors.brown[300],
+      /* appBar: AppBar(
+        title: Text("Registro nuevo"),
+      ), */
       body: Stack(
         children: <Widget>[
           _crearFondo(context),
@@ -112,7 +117,7 @@ class LoginPage extends StatelessWidget {
             child: Column(
               children: <Widget>[
                 Text(
-                  'Ingreso',
+                  'Crear cuenta',
                   style: TextStyle(fontSize: 20.0),
                 ),
                 SizedBox(
@@ -135,14 +140,13 @@ class LoginPage extends StatelessWidget {
           ),
           FlatButton(
             child: Text(
-              "Crear nueva cuenta",
+              "¿Ya tienes una cuenta? Login",
               style: TextStyle(color: Colors.white),
             ),
             color: Colors.deepPurple,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0)),
-            onPressed: () =>
-                Navigator.pushNamed(context, Paginagistro.routname),
+            onPressed: () => Navigator.pop(context),
           ),
           SizedBox(
             height: 100.0,
@@ -216,19 +220,18 @@ class LoginPage extends StatelessWidget {
               elevation: 5.0,
               color: Colors.deepPurple,
               textColor: Colors.white,
-              onPressed: snashoot.hasData ? () => _login(bloc, context) : null);
+              onPressed: snashoot.hasData ? () => _register(bloc, context) : null);
         });
   }
 
-  _login(LoginBloc bloc, BuildContext context) async {
-    Map login = await usuarioProvider.login(bloc.email, bloc.password, context);    
+  _register(LoginBloc bloc, BuildContext context) async {
+    
+    Map login = await usuarioProvider.nuevoUsuario(bloc.email, bloc.password);
     if (login['ok'] == true) {
       Navigator.pushNamed(context,
           HomePage.routeName); //Da la opcion de regresar de donde se llamo
     } else {            
       mostrarAlerta(context, login['mensaje']);      
     }
-
-    //Navigator.pushReplacementNamed(context, HomePage.routeName);//No Da la opcion de regresar de donde se llamo
   }
 }
