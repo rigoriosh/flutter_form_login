@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_form_login/src/bloc/provider.dart';
 import 'package:flutter_form_login/src/pages/page_home.dart';
 import 'package:flutter_form_login/src/pages/page_login.dart';
@@ -14,10 +17,14 @@ void main()async{
   }
 
 class MyApp extends StatelessWidget {
+  final prefs = new PreferenciasUsuario();
+  bool _ingresar = true;
   @override
   Widget build(BuildContext context) {
+
+    //_verficarEstado(context);
     
-    final prefs = new PreferenciasUsuario();
+    
 
     print("prefs.token");
     print(prefs.token);
@@ -29,14 +36,20 @@ class MyApp extends StatelessWidget {
     );
   }
 
+  
+
+  
+
   Widget myMaterialApp(PreferenciasUsuario prefs) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Material App',
-      initialRoute: (prefs.token.isEmpty)?'login':HomePage.routeName,
-      //initialRoute: 'login',
+      //initialRoute: prefs.verficarEstado,
+      initialRoute: (prefs.token.isEmpty)?LoginPage.routName:HomePage.routeName,
+      //initialRoute: !_ingresar?LoginPage.routName:HomePage.routeName,      
+      //initialRoute: LoginPage.routName,
       routes: {
-        'login': (BuildContext context) => LoginPage(),
+        LoginPage.routName: (BuildContext context) => LoginPage(),
         HomePage.routeName: (BuildContext context) => HomePage(),
         ProductoPage.routname: (BuildContext context) => ProductoPage(),
         Paginagistro.routname: (BuildContext context) => Paginagistro(),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_form_login/src/pages/page_login.dart';
 import 'package:flutter_form_login/src/preferencias_usuario/preferencias_usuario.dart';
 import 'package:flutter_form_login/src/utils.dart';
 import 'package:http/http.dart' as http;
@@ -11,12 +12,9 @@ import 'package:http_parser/http_parser.dart';
 
 class ProductosProvider {
   static final _prefs = new PreferenciasUsuario();
-  final String _urlBase =
-      "https://flutter-varius-de545.firebaseio.com/productos";
-  final String _urlJson =
-      "https://flutter-varius-de545.firebaseio.com/productos.json?auth=${_prefs.token}";
+  final String _urlBase = "";
+  final String _urlJson = "";
 
-  
   Future<bool> crearProducto(ProductoModel producto) async {
     final respuesta =
         await http.post(_urlJson, body: productoModelToJson(producto));
@@ -39,11 +37,14 @@ class ProductosProvider {
   Future<List<ProductoModel>> traerProductoDB(BuildContext context) async {
     final respuestaDB = await http.get(_urlJson);
     final Map<String, dynamic> decodificarData = json.decode(respuestaDB.body);
-    
-    if (respuestaDB.statusCode == 401) {
-      mostrarAlerta(context, decodificarData["error"]);
-      Navigator.pop(context);      
-    }
+
+    /* if (respuestaDB.statusCode == 401) {
+      //mostrarAlerta(context, decodificarData["error"]);
+      Navigator.pushReplacementNamed(context, LoginPage.routName);
+      //Navigator.pop(context);
+      //Navigator.pushNamed(context, LoginPage.routName);
+      return [];
+    } else { */
     final List<ProductoModel> listaProductos = new List();
     if (decodificarData == null) return [];
 
@@ -53,10 +54,12 @@ class ProductosProvider {
       listaProductos.add(productTemp);
     });
     return listaProductos;
+    //}
   }
 
   Future<bool> deleteProducto(String id) async {
-    final respuestaDB = await http.delete('$_urlBase/$id.json?auth=${_prefs.token}');
+    final respuestaDB =
+        await http.delete('$_urlBase/$id.json?auth=${_prefs.token}');
 
     print(json.decode(respuestaDB.body));
 

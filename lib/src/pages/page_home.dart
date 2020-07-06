@@ -1,44 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_login/src/bloc/provider.dart';
 import 'package:flutter_form_login/src/modelos/producto_model.dart';
+import 'package:flutter_form_login/src/pages/page_login.dart';
 import 'package:flutter_form_login/src/pages/produc_page.dart';
-import 'package:flutter_form_login/src/providers/productos_provider.dart';
 
 class HomePage extends StatelessWidget {
-  static final String routeName = 'ajustes';
+  static final String routeName = 'home';
   @override
   Widget build(BuildContext context) {
+    final productoBloc = Provider.productosBloc(context);
+    productoBloc.cargarProductos(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('pagina home'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.power_settings_new,
+            ),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, LoginPage.routName);
+            },
+          )
+        ],
       ),
-      body: _productodDB(context),
+      body: _productodDB(context, productoBloc),
       floatingActionButton: _crearBoton(context),
     );
   }
 
-  Widget _productodDB(BuildContext context) {
-    return FutureBuilder(
-      future: ProductosProvider().traerProductoDB(context),
-      builder:
-          (BuildContext context, AsyncSnapshot<List<ProductoModel>> snapshot) {
-        if (snapshot.hasData) {
-          final data = snapshot.data;
-          return ListView.builder(
-            itemCount: data.length,
-            /* itemBuilder: (BuildContext context , int item){
+  Widget _productodDB(BuildContext context, ProductoBloc pb) {
+    return StreamBuilder(
+        stream: pb.productosStream,
+        builder: (BuildContext context,
+            AsyncSnapshot<List<ProductoModel>> snapshot) {
+          if (snapshot.hasData) {
+            final data = snapshot.data;
+            return ListView.builder(
+              itemCount: data.length,
+              /* itemBuilder: (BuildContext context , int item){
               return _mostrarProducto(data[item]);
             } */
-            itemBuilder: (BuildContext context, int i) =>
-                _mostrarProducto(data[i], context),
-          );
-        } else {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
-    );
+              itemBuilder: (BuildContext context, int i) =>
+                  _mostrarProducto(data[i], context),
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        });
   }
 
   Widget _mostrarProducto(ProductoModel data, BuildContext context) {
@@ -49,7 +61,7 @@ class HomePage extends StatelessWidget {
         color: Colors.red,
       ),
       onDismissed: (direccion) {
-        ProductosProvider().deleteProducto(data.id);
+        //ProductosProvider().deleteProducto(data.id);
       },
     );
   }

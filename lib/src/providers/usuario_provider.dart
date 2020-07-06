@@ -10,8 +10,7 @@ class UsuarioProvider {
 
   Future<Map<String, dynamic>> login(
       String email, String password, BuildContext context) async {
-    final url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
+    final url = "";
     final authData = {
       'email': email,
       'password': password,
@@ -36,8 +35,7 @@ class UsuarioProvider {
 
   Future<Map<String, dynamic>> nuevoUsuario(
       String email, String password) async {
-    String url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=";
+    String url = "";
     final authData = {
       'email': email,
       'password': password,

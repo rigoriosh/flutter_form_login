@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter_form_login/src/pages/page_home.dart';
+import 'package:flutter_form_login/src/pages/page_login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /*
@@ -25,6 +28,8 @@ class PreferenciasUsuario {
 
   SharedPreferences _prefs;
 
+  get http => null;
+
   initPrefs() async {
     this._prefs = await SharedPreferences.getInstance();
   }
@@ -41,7 +46,7 @@ class PreferenciasUsuario {
 
   // GET y SET de la última página
   get ultimaPagina {
-    return _prefs.getString('ultimaPagina') ?? HomePage.routeName;
+    return _prefs.getString('ultimaPagina') ?? LoginPage.routName;
   }
 
   set ultimaPagina( String value ) {

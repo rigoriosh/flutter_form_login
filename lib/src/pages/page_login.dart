@@ -6,6 +6,7 @@ import 'package:flutter_form_login/src/providers/usuario_provider.dart';
 import 'package:flutter_form_login/src./utils.dart';
 
 class LoginPage extends StatelessWidget {
+  static final String routName = 'login';
   final usuarioProvider = new UsuarioProvider();
 
   @override
@@ -221,6 +222,7 @@ class LoginPage extends StatelessWidget {
   }
 
   _login(LoginBloc bloc, BuildContext context) async {
+    print('Ingreso al login');
     Map login = await usuarioProvider.login(bloc.email, bloc.password, context);    
     if (login['ok'] == true) {
       Navigator.pushNamed(context,
