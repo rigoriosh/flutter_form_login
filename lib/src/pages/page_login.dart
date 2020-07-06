@@ -222,13 +222,12 @@ class LoginPage extends StatelessWidget {
   }
 
   _login(LoginBloc bloc, BuildContext context) async {
-    print('Ingreso al login');
-    Map login = await usuarioProvider.login(bloc.email, bloc.password, context);    
+    Map login = await usuarioProvider.login(bloc.email, bloc.password, context);
     if (login['ok'] == true) {
       Navigator.pushNamed(context,
           HomePage.routeName); //Da la opcion de regresar de donde se llamo
-    } else {            
-      mostrarAlerta(context, login['mensaje']);      
+    } else {
+      mostrarAlerta(context, login['mensaje']);
     }
 
     //Navigator.pushReplacementNamed(context, HomePage.routeName);//No Da la opcion de regresar de donde se llamo

@@ -43,7 +43,7 @@ class HomePage extends StatelessWidget {
               return _mostrarProducto(data[item]);
             } */
               itemBuilder: (BuildContext context, int i) =>
-                  _mostrarProducto(data[i], context),
+                  _mostrarProducto(data[i], context, pb),
             );
           } else {
             return Center(
@@ -53,7 +53,8 @@ class HomePage extends StatelessWidget {
         });
   }
 
-  Widget _mostrarProducto(ProductoModel data, BuildContext context) {
+  Widget _mostrarProducto(
+      ProductoModel data, BuildContext context, ProductoBloc pb) {
     return Dismissible(
       child: _listarProductos(data, context),
       key: UniqueKey(),
@@ -62,6 +63,7 @@ class HomePage extends StatelessWidget {
       ),
       onDismissed: (direccion) {
         //ProductosProvider().deleteProducto(data.id);
+        pb.borrarProducto(data.id);
       },
     );
   }

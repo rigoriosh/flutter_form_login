@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_login/src/bloc/provider.dart';
 import 'dart:io';
 import 'package:flutter_form_login/src/modelos/producto_model.dart';
-import 'package:flutter_form_login/src/providers/productos_provider.dart';
 import 'package:flutter_form_login/src/utils.dart' as utils;
 import 'package:image_picker/image_picker.dart';
 
@@ -16,13 +16,15 @@ class ProductoPage extends StatefulWidget {
 class _ProductoPageState extends State<ProductoPage> {
   final myFormKey = GlobalKey<FormState>();
   final myScaffoldKey = GlobalKey<ScaffoldState>();
-  final productosProvider = new ProductosProvider();
+  ProductoBloc pb;
   ProductoModel modeloProducto = new ProductoModel();
   bool _guardando = false;
   File foto;
 
   @override
   Widget build(BuildContext context) {
+    pb = Provider.productosBloc(context);
+
     final ProductoModel prodData = ModalRoute.of(context)
         .settings
         .arguments; //carga la data enviada como argumentos
@@ -150,16 +152,17 @@ class _ProductoPageState extends State<ProductoPage> {
     _guardando = true;
 
     if (foto != null) {
-      print("/////////////////////////////subiendo foto");
-      modeloProducto.fotoUrl = await productosProvider.subirImagen(foto);
-      print("******************************foto cargada");
+      //modeloProducto.fotoUrl = await productosProvider.subirImagen(foto);
+      modeloProducto.fotoUrl = await pb.sibirFoto(foto);
     }
 
     if (modeloProducto.id == null) {
-      productosProvider.crearProducto(modeloProducto);
+      //productosProvider.crearProducto(modeloProducto);
+      pb.agregarProducto(modeloProducto);
       mostrarSnackBar("Succesful saved product");
     } else {
-      productosProvider.editProducto(modeloProducto);
+      //productosProvider.editProducto(modeloProducto);
+      pb.editarProducto(modeloProducto);
       mostrarSnackBar("Succesful edited product");
     }
 
