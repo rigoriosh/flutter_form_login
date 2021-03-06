@@ -10,20 +10,17 @@ class UsuarioProvider {
 
   Future<Map<String, dynamic>> login(
       String email, String password, BuildContext context) async {
-    final url = "";
+    final url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
     final authData = {
       'email': email,
       'password': password,
       'returnSecureToken': true
     };
 
-    print("token $url$_token");
-
     final resp = await http.post(url + _token, body: jsonEncode(authData));
 
     Map<String, dynamic> decodedResp = json.decode(resp.body);
-
-    print(decodedResp);
 
     if (decodedResp.containsKey('idToken')) {
       _prefers.token = decodedResp['idToken'];
@@ -35,20 +32,17 @@ class UsuarioProvider {
 
   Future<Map<String, dynamic>> nuevoUsuario(
       String email, String password) async {
-    String url = "";
+    String url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=";
     final authData = {
       'email': email,
       'password': password,
       'returnSecureToken': true
     };
 
-    print("token $url$_token");
-
     final resp = await http.post(url + _token, body: jsonEncode(authData));
 
     Map<String, dynamic> decodedResp = json.decode(resp.body);
-
-    print(decodedResp);
 
     if (decodedResp.containsKey('idToken')) {
       _prefers.token = decodedResp['idToken'];

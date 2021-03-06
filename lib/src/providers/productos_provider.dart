@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_login/src/pages/page_login.dart';
 import 'package:flutter_form_login/src/preferencias_usuario/preferencias_usuario.dart';
-import 'package:flutter_form_login/src/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_form_login/src/modelos/producto_model.dart';
 import 'package:mime_type/mime_type.dart';
@@ -12,8 +11,11 @@ import 'package:http_parser/http_parser.dart';
 
 class ProductosProvider {
   static final _prefs = new PreferenciasUsuario();
-  final String _urlBase = "";
-  final String _urlJson = "";
+  //se debe agregar credenciales propiuas de firebase
+  final String _urlBase =
+      "https://flutter-varius-de545.firebaseio.com/productos";
+  final String _urlJson =
+      "https://flutter-varius-de545.firebaseio.com/productos.json?auth=${_prefs.token}";
 
   Future<bool> crearProducto(ProductoModel producto) async {
     final respuesta =
@@ -21,13 +23,13 @@ class ProductosProvider {
 
     final decodificarData = json.decode(respuesta.body);
 
-    print(decodificarData);
+    //print(decodificarData);
     return true;
   }
 
   Future<bool> editProducto(ProductoModel producto) async {
     final strinfUrl = '$_urlBase/${producto.id}.json';
-    print(strinfUrl);
+
     final respuesta =
         await http.put(strinfUrl, body: productoModelToJson(producto));
     final decodificarData = json.decode(respuesta.body);
@@ -38,30 +40,30 @@ class ProductosProvider {
     final respuestaDB = await http.get(_urlJson);
     final Map<String, dynamic> decodificarData = json.decode(respuestaDB.body);
 
-    /* if (respuestaDB.statusCode == 401) {
+    if ((respuestaDB.statusCode == 401)) {
       //mostrarAlerta(context, decodificarData["error"]);
       Navigator.pushReplacementNamed(context, LoginPage.routName);
       //Navigator.pop(context);
       //Navigator.pushNamed(context, LoginPage.routName);
       return [];
-    } else { */
-    final List<ProductoModel> listaProductos = new List();
-    if (decodificarData == null) return [];
+    } else {
+      final List<ProductoModel> listaProductos = new List();
+      if (decodificarData == null) return [];
 
-    decodificarData.forEach((id, productoJson) {
-      final productTemp = ProductoModel.fromJson(productoJson);
-      productTemp.id = id;
-      listaProductos.add(productTemp);
-    });
-    return listaProductos;
-    //}
+      decodificarData.forEach((id, productoJson) {
+        final productTemp = ProductoModel.fromJson(productoJson);
+        productTemp.id = id;
+        listaProductos.add(productTemp);
+      });
+      return listaProductos;
+    }
   }
 
   Future<bool> deleteProducto(String id) async {
     final respuestaDB =
         await http.delete('$_urlBase/$id.json?auth=${_prefs.token}');
 
-    print(json.decode(respuestaDB.body));
+    //print(json.decode(respuestaDB.body));
 
     return true;
   }
@@ -87,7 +89,7 @@ class ProductosProvider {
     }
 
     final respData = json.decode(respuesta.body);
-    print(respData);
+
     return respData['secure_url'];
   }
 }
